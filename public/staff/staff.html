@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>document.documentElement.classList.add("auth-pending")</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/tables.css">
+  <title>Staff · SPN School Reports</title>
+</head>
+<body>
+  <header class="app-header">
+    <nav><strong>SPN School Reports</strong><a href="/staff/staff.html">Staff</a></nav>
+    <span class="who"><span data-user-name></span> (<span data-user-role></span>) · <a href="#" data-logout>Sign out</a></span>
+  </header>
+  <main class="page">
+    <div class="page-head">
+      <h1>Staff</h1>
+      <a id="add-link" class="btn-link" href="/staff/add-staff.html" hidden>Add staff</a>
+    </div>
+    <div id="notice" class="notice error" role="alert" hidden></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th id="action-col" hidden><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody id="staff-body"><tr><td class="empty" colspan="4">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+  <script type="module">
+    import { requireAuth } from "/js/auth-guard.js";
+    import { initStaffList } from "/js/staff/staff.js";
+
+    const { profile } = await requireAuth(["admin", "headteacher"]);
+    if (profile.role === "admin") {
+      document.getElementById("add-link").hidden = false;
+      document.getElementById("action-col").hidden = false;
+    }
+    initStaffList(profile);
+  </script>
+</body>
+</html>

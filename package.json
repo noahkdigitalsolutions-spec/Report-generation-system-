@@ -1,0 +1,21 @@
+{
+  "name": "spn-school-report-system",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/marks-validation-tests.js tests/grading-tests.js tests/report-calculation-tests.js tests/report-workflow-tests.js tests/report-format-tests.js",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-spn \"node --test tests-rules/firestore-rules.test.js\"",
+    "emulators": "firebase emulators:start",
+    "seed:emulator": "node scripts/seed-emulator.js",
+    "sync:grading": "node scripts/sync-grade-calculator.js"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.14.1",
+    "firebase-admin": "^12.6.0",
+    "firebase-tools": "^13.29.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

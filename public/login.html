@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · SPN School Reports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <main class="auth">
+    <section class="auth-brand">
+      <img class="auth-logo" src="/assets/images/school-logo.png" alt="" onerror="this.remove()">
+      <h1>SPN School Reports</h1>
+      <p>Enter marks, check them, and print term reports in one place.</p>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-card">
+        <h2>Sign in</h2>
+        <p class="lead">Use the email and password the school gave you.</p>
+
+        <div id="notice" class="notice error" role="alert" hidden></div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="username" inputmode="email" required>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input id="password" name="password" type="password" autocomplete="current-password" required>
+              <button type="button" class="toggle-password" aria-controls="password" aria-pressed="false">Show</button>
+            </div>
+          </div>
+          <button id="submit" class="btn-primary" type="submit">Sign in</button>
+        </form>
+
+        <p class="auth-links"><a href="/forgot-password.html">Forgot your password?</a></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { signIn } from "/js/auth.js";
+    import { redirectIfSignedIn } from "/js/auth-guard.js";
+
+    redirectIfSignedIn();
+
+    const form = document.getElementById("login-form");
+    const notice = document.getElementById("notice");
+    const submit = document.getElementById("submit");
+    const pw = document.getElementById("password");
+    const toggle = document.querySelector(".toggle-password");
+    const params = new URLSearchParams(location.search);
+
+    if (params.get("reason") === "inactive") {
+      showError("This account is deactivated. Contact the administrator.");
+    }
+
+    toggle.addEventListener("click", () => {
+      const show = pw.type === "password";
+      pw.type = show ? "text" : "password";
+      toggle.textContent = show ? "Hide" : "Show";
+      toggle.setAttribute("aria-pressed", String(show));
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      notice.hidden = true;
+
+      const email = form.email.value;
+      const password = form.password.value;
+      if (!email || !password) {
+        showError("Enter your email and password.");
+        (email ? pw : form.email).focus();
+        return;
+      }
+
+      submit.disabled = true;
+      submit.textContent = "Signing in…";
+      try {
+        await signIn(email, password, params.get("next"));
+      } catch (err) {
+        showError(err.message);
+        submit.disabled = false;
+        submit.textContent = "Sign in";
+        pw.select();
+      }
+    });
+
+    function showError(msg) {
+      notice.textContent = msg;
+      notice.hidden = false;
+    }
+  </script>
+</body>
+</html>

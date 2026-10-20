@@ -1,0 +1,209 @@
+/* Dialogs and form controls used by setup pages */
+dialog {
+  width: min(480px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 1.5rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 0;
+  border-radius: var(--radius);
+  overflow-y: auto;
+}
+dialog::backdrop { background: rgba(20, 33, 61, 0.55); }
+
+.dialog-title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  text-transform: capitalize;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.dialog-actions .btn-primary { width: auto; padding: 0 1.25rem; }
+.dialog-actions .btn-small { height: 48px; padding: 0 1rem; }
+
+.field .help { margin: 0.375rem 0 0; font-size: 0.875rem; color: var(--ink-soft); }
+
+.field label.check {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0.25rem 0;
+  font-weight: 400;
+  cursor: pointer;
+}
+.field .check input { width: 1.125rem; height: 1.125rem; flex: none; accent-color: var(--ink); }
+
+fieldset.checklist {
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+}
+fieldset.checklist legend { padding: 0 0.25rem; font-weight: 600; font-size: 0.9375rem; }
+
+/* Full-page forms */
+.form-card { max-width: 640px; }
+.form-section {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+}
+.form-section:first-of-type { margin-top: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 1rem; }
+.form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+.form-actions .btn-primary { width: auto; padding: 0 1.5rem; }
+.form-actions .btn-small { height: 48px; padding: 0 1.25rem; display: inline-flex; align-items: center; text-decoration: none; }
+
+/* Filters above lists */
+.filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+.filters input, .filters select {
+  height: 42px;
+  padding: 0 0.75rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+}
+.filters input[type="search"] { flex: 1 1 220px; min-width: 0; }
+.result-count { margin: 0.75rem 0 0; font-size: 0.875rem; color: var(--ink-soft); }
+
+/* Key-value details */
+.details { display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.5rem; margin: 0; }
+.details dt { color: var(--ink-soft); }
+.details dd { margin: 0; }
+.profile-block + .profile-block { margin-top: 1.25rem; }
+.profile-block h2 { margin: 0 0 0.75rem; font-family: var(--font-display); font-size: 1.0625rem; }
+.table-link { color: var(--ink); font-weight: 600; }
+
+.page-head > select {
+  height: 42px;
+  padding: 0 0.75rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* Per-subject cards on the assessment page */
+.subject-card { margin-bottom: 1rem; padding: 1rem 1.25rem; }
+.subject-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.subject-head h2 { margin: 0; font-family: var(--font-display); font-size: 1.0625rem; }
+.subject-tools { display: flex; align-items: center; gap: 0.75rem; }
+.subject-card .help { margin: 0; color: var(--ink-soft); font-size: 0.9375rem; }
+
+/* Marks entry sheet */
+.sheet-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.sheet-title { font-weight: 700; }
+.progress { font-size: 0.9375rem; color: var(--ink-soft); }
+label.check.only-missing { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9375rem; }
+.only-missing input, .mark-controls input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: var(--ink); }
+
+.mark-list {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.mark-row {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  gap: 0.125rem 0.75rem;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--line);
+}
+.mark-row:last-child { border-bottom: 0; }
+.mark-row .num { color: var(--ink-soft); font-size: 0.875rem; text-align: right; }
+.mark-row .who { min-width: 0; }
+.mark-row .who strong { display: block; overflow-wrap: anywhere; }
+.mark-row .who small { color: var(--ink-soft); }
+.mark-controls { display: flex; align-items: center; gap: 0.75rem; }
+.mark-controls label.check { display: flex; align-items: center; gap: 0.375rem; font-size: 0.9375rem; cursor: pointer; }
+
+.score-input {
+  width: 5.5rem;
+  height: 46px;
+  padding: 0 0.5rem;
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+}
+.score-input:focus-visible { border-color: var(--ink); outline-offset: 0; }
+.score-input[aria-invalid="true"] { border-color: var(--danger); background: var(--danger-bg); }
+.score-input:disabled { color: var(--ink-soft); background: var(--paper); }
+
+.row-status { grid-column: 2 / -1; min-height: 1.25rem; font-size: 0.875rem; }
+.row-status:empty { min-height: 0; }
+.row-status.saving { color: var(--ink-soft); }
+.row-status.saved { color: var(--ok); }
+.row-status.failed { color: var(--danger); }
+.row-status .btn-small { padding: 0.125rem 0.5rem; }
+
+@media (max-width: 480px) {
+  .mark-row { grid-template-columns: 2rem 1fr; }
+  .mark-controls { grid-column: 2; }
+}
+
+/* Grade scale editor */
+dialog.wide { width: min(720px, calc(100vw - 2rem)); }
+table.boundaries input {
+  width: 100%;
+  min-width: 4rem;
+  height: 40px;
+  padding: 0 0.5rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+}
+table.boundaries td, table.boundaries th { padding: 0.375rem 0.5rem; }
+table.boundaries td:nth-child(1), table.boundaries td:nth-child(3), table.boundaries td:nth-child(4) { width: 5.5rem; }
+table.boundaries .to { display: inline-block; min-width: 2.5rem; text-align: center; color: var(--ink-soft); }
+.row-tools { display: flex; gap: 0.5rem; margin: 0.75rem 0; }
+.field.try input { max-width: 10rem; }
+.try-out { margin-left: 0.75rem; font-weight: 600; }
+.page > .help { margin: 0 0 1rem; color: var(--ink-soft); }
+
+/* Report generation results */
+.plain-list { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+.plain-list li + li { margin-top: 0.25rem; }
+.problem-details { margin-bottom: 1rem; padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.problem-details summary { cursor: pointer; font-weight: 600; }

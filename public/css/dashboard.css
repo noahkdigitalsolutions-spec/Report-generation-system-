@@ -1,0 +1,15 @@
+/* Role dashboards */
+.dash-greeting { margin: 0 0 0.25rem; font-size: 1.75rem; }
+.dash-sub { margin: 0 0 1.5rem; color: var(--ink-soft); }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+.tile {
+  display: block; padding: 1.125rem 1.25rem; color: var(--ink); text-decoration: none;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius);
+}
+.tile:hover { border-color: var(--ink); }
+.tile strong { display: block; margin-bottom: 0.25rem; font-family: var(--font-display); font-size: 1.0625rem; }
+.tile span { color: var(--ink-soft); font-size: 0.9375rem; }
+.stat-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+.stat { flex: 1 1 160px; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.75rem; }
+.stat span { color: var(--ink-soft); font-size: 0.9375rem; }

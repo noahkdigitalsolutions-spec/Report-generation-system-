@@ -1,0 +1,92 @@
+/* Printable report cards. On screen they look like paper; when printed they are A4 pages. */
+.report-page { max-width: 900px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin-bottom: 1rem; }
+.toolbar .btn-small, .toolbar .btn-link { height: 42px; display: inline-flex; align-items: center; }
+.toolbar .btn-link:disabled { opacity: 0.5; cursor: not-allowed; }
+.toolbar label.check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9375rem; cursor: pointer; }
+.toolbar label.check input { width: 1.125rem; height: 1.125rem; accent-color: var(--ink); }
+
+.sheets { display: grid; gap: 1.5rem; }
+
+.report {
+  position: relative;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 12mm;
+  color: #111;
+  font-size: 12px;
+  line-height: 1.35;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 10px rgba(20, 33, 61, 0.08);
+}
+.report h1, .report h2, .report h3, .report p { margin: 0; }
+
+.report-head { display: flex; align-items: center; gap: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--ink); }
+.report-logo { height: 64px; width: auto; flex: none; }
+.report-head h1 { font-family: var(--font-display); font-size: 22px; line-height: 1.1; }
+.report-head .motto { font-style: italic; }
+.report-head .contact { font-size: 11px; color: #444; }
+
+.report-title { margin: 10px 0 8px; font-family: var(--font-display); font-size: 16px; text-align: center; letter-spacing: 0.02em; }
+
+.student-info { display: grid; grid-template-columns: repeat(2, max-content 1fr); gap: 3px 14px; margin: 0 0 10px; padding: 8px 10px; border: 1px solid #bbb; }
+.student-info dt { color: #444; }
+.student-info dd { margin: 0; font-weight: 600; }
+
+table.marks { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+table.marks th, table.marks td { padding: 4px 6px; border: 1px solid #999; text-align: left; vertical-align: top; }
+table.marks thead th { background: #eceff4; font-size: 11px; }
+table.marks tbody th { font-weight: 600; white-space: nowrap; }
+table.marks td.parts { font-size: 10.5px; color: #333; }
+table.marks td.num, table.marks thead th:nth-child(3), table.marks thead th:nth-child(4) { text-align: center; width: 52px; }
+table.marks tfoot th, table.marks tfoot td { font-weight: 700; background: #f6f7fa; }
+
+.remarks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
+.remark { padding: 6px 8px; border: 1px solid #bbb; min-height: 74px; display: flex; flex-direction: column; }
+.remark h3 { font-size: 11px; color: #444; margin-bottom: 3px; }
+.remark p { flex: 1; }
+.sign { margin-top: 14px; padding-top: 2px; border-top: 1px solid #555; font-size: 10px; color: #444; }
+
+.report-foot { display: grid; gap: 3px; padding-top: 6px; border-top: 1px solid #bbb; font-size: 10.5px; color: #333; }
+.report-foot .note { font-style: italic; }
+
+/* DRAFT stamp */
+.report.is-draft::after {
+  content: attr(data-banner);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 90px;
+  color: rgba(179, 38, 30, 0.14);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .report { padding: 12px; }
+  .student-info { grid-template-columns: max-content 1fr; }
+  .remarks { grid-template-columns: 1fr; }
+  table.marks { display: block; overflow-x: auto; }
+}
+
+@page { size: A4 portrait; margin: 10mm; }
+@media print {
+  html, body { background: #fff !important; }
+  .no-print, .app-header, .tabs { display: none !important; }
+  .report-page { max-width: none; padding: 0; margin: 0; }
+  .sheets { display: block; }
+  .report {
+    max-width: none; margin: 0; padding: 0;
+    border: 0; box-shadow: none;
+    break-after: page; break-inside: avoid;
+  }
+  .report:last-child { break-after: auto; }
+  .student-info { grid-template-columns: repeat(2, max-content 1fr) !important; }
+  .remarks { grid-template-columns: 1fr 1fr !important; }
+  table.marks { display: table !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

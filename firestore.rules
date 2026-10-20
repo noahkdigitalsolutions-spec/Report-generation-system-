@@ -1,0 +1,105 @@
+rules_version = '2';
+
+// Who can read and write what. The browser is never trusted: roles come from users/{uid}.
+// Students, enrollments, reports, the audit log and admission numbers are written only by
+// Cloud Functions (the Admin SDK bypasses these rules). Verified by `npm run test:rules`.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn() { return request.auth != null; }
+    function profile() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isActive() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && profile().active == true;
+    }
+    function hasRole(roles) { return isActive() && profile().role in roles; }
+    function isStaffOffice() { return hasRole(['admin', 'academic']); }
+    function seesEverything() { return hasRole(['admin', 'headteacher', 'academic']); }
+
+    // A teacher is assigned to a mark if there is an assignment for the whole class ("all" streams)
+    // or for the mark's own stream. Queries must filter by year, class, subject (and stream when the
+    // assignment is per stream) so Firestore can prove the rule holds for every result.
+    function assignedTo(d) {
+      let base = d.academicYearId + '_' + request.auth.uid + '_' + d.classId + '_';
+      return exists(/databases/$(database)/documents/teacherAssignments/$(base + 'all_' + d.subjectId))
+        || (d.streamId != null
+            && exists(/databases/$(database)/documents/teacherAssignments/$(base + d.streamId + '_' + d.subjectId)));
+    }
+
+    // ---------- users ----------
+    match /users/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow get, list: if hasRole(['admin', 'headteacher']);
+      // The academic office may list teachers (to assign them), and only teachers.
+      allow get, list: if hasRole(['academic']) && resource.data.role == 'teacher';
+      allow write: if hasRole(['admin']);
+    }
+
+    // ---------- reference data: anyone active reads, admin and academic office write ----------
+    match /academicYears/{id}       { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /terms/{id}               { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /classes/{id}             { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /streams/{id}             { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /subjects/{id}            { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /subjectCombinations/{id} { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /gradingScales/{id}       { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /remarkRules/{id}         { allow read: if isActive(); allow write: if isStaffOffice(); }
+    match /assessments/{id}         { allow read: if isActive(); allow write: if isStaffOffice(); }
+
+    match /settings/{id} {
+      allow read: if isActive();
+      allow write: if hasRole(['admin']);
+    }
+
+    // ---------- written by Cloud Functions only ----------
+    match /students/{id}    { allow read: if isActive(); allow write: if false; }
+    match /enrollments/{id} { allow read: if isActive(); allow write: if false; }
+    match /reports/{id}     { allow read: if seesEverything(); allow write: if false; }
+    match /auditLogs/{id}   { allow read: if hasRole(['admin', 'headteacher']); allow write: if false; }
+    match /admissionNumbers/{id} { allow read, write: if false; }
+
+    // ---------- teacher assignments ----------
+    match /teacherAssignments/{id} {
+      allow read: if seesEverything() || (isActive() && resource.data.teacherUid == request.auth.uid);
+      allow write: if isStaffOffice();
+    }
+
+    // ---------- marks ----------
+    match /marks/{markId} {
+      allow read: if seesEverything()
+        || (hasRole(['teacher']) && assignedTo(resource.data));
+
+      // Admin and academic office can correct any mark, even after an assessment is locked.
+      allow create, update, delete: if isStaffOffice();
+
+      function validTeacherMark() {
+        let d = request.resource.data;
+        let a = get(/databases/$(database)/documents/assessments/$(d.assessmentId)).data;
+        return hasRole(['teacher'])
+          && d.keys().hasOnly(['assessmentId', 'academicYearId', 'termId', 'classId', 'streamId', 'subjectId',
+                               'studentId', 'score', 'absent', 'enteredBy', 'updatedAt'])
+          && d.keys().hasAll(['assessmentId', 'academicYearId', 'termId', 'classId', 'streamId', 'subjectId',
+                              'studentId', 'score', 'absent', 'enteredBy', 'updatedAt'])
+          && markId == d.assessmentId + '_' + d.studentId
+          && d.enteredBy == request.auth.uid
+          && d.updatedAt == request.time
+          && a.status == 'open'
+          && a.subjectId == d.subjectId
+          && a.classId == d.classId
+          && a.academicYearId == d.academicYearId
+          && a.termId == d.termId
+          && (d.score == null || (d.score is number && d.score >= 0 && d.score <= a.maxScore))
+          && d.absent is bool
+          && assignedTo(d);
+      }
+
+      allow create: if validTeacherMark();
+      allow update: if validTeacherMark()
+        && request.resource.data.studentId == resource.data.studentId
+        && request.resource.data.assessmentId == resource.data.assessmentId;
+      // Teachers cannot delete marks; only the academic office can (rule above).
+    }
+  }
+}

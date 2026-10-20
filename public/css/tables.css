@@ -1,0 +1,16 @@
+/* Tables and tab bars */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.75rem 1rem; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--line); }
+thead th { font-size: 0.8125rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-soft); background: #faf9f5; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+tbody tr:hover { background: #faf9f5; }
+td.empty { padding: 2rem 1rem; text-align: center; color: var(--ink-soft); }
+.row-actions { display: flex; gap: 0.5rem; justify-content: flex-end; white-space: nowrap; }
+.table-link { font-weight: 600; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tabs { display: flex; gap: 0.25rem; padding: 0 1.25rem; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--line); }
+.tabs a { flex: none; padding: 0.75rem 1rem; color: var(--ink-soft); font-weight: 600; text-decoration: none; border-bottom: 3px solid transparent; }
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }

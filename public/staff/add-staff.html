@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>document.documentElement.classList.add("auth-pending")</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/tables.css">
+  <title>Add staff · SPN School Reports</title>
+</head>
+<body>
+  <header class="app-header">
+    <nav><strong>SPN School Reports</strong><a href="/staff/staff.html">Staff</a></nav>
+    <span class="who"><span data-user-name></span> (<span data-user-role></span>) · <a href="#" data-logout>Sign out</a></span>
+  </header>
+  <main class="page">
+    <div class="page-head"><h1>Add staff</h1></div>
+
+    <div class="card narrow">
+      <div id="notice" class="notice error" role="alert" hidden></div>
+
+      <form id="staff-form" novalidate>
+        <div class="field">
+          <label for="fullName">Full name</label>
+          <input id="fullName" name="fullName" type="text" autocomplete="off" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="off" inputmode="email" required>
+        </div>
+        <div class="field">
+          <label for="role">Role</label>
+          <select id="role" name="role" required></select>
+        </div>
+        <button id="submit" class="btn-primary" type="submit">Create account</button>
+      </form>
+
+      <div id="result" hidden>
+        <div class="notice success" role="status">
+          Account created for <strong id="result-name"></strong>. Send them this link so they can choose a password.
+        </div>
+        <div class="link-box">
+          <input id="setup-link" type="text" readonly aria-label="Password setup link">
+          <button id="copy" class="btn-small" type="button">Copy</button>
+        </div>
+        <p class="lead" style="margin-top:0.75rem;font-size:0.9375rem;color:var(--ink-soft)">
+          The link works once and expires after about an hour. If it expires, the person can use
+          "Forgot your password?" on the sign-in page.
+        </p>
+        <button id="another" class="btn-small" type="button">Add another</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "/js/auth-guard.js";
+    import { functions } from "/js/firebase-init.js";
+    import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
+    import { ROLE_LABELS } from "/js/utils/constants.js";
+
+    await requireAuth(["admin"]);
+
+    const createStaffUser = httpsCallable(functions, "createStaffUser");
+    const form = document.getElementById("staff-form");
+    const notice = document.getElementById("notice");
+    const submit = document.getElementById("submit");
+    const result = document.getElementById("result");
+    const roleSelect = document.getElementById("role");
+
+    roleSelect.append(new Option("Choose a role", "", true, true));
+    roleSelect.options[0].disabled = true;
+    for (const [value, label] of Object.entries(ROLE_LABELS)) roleSelect.append(new Option(label, value));
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      notice.hidden = true;
+
+      const data = {
+        fullName: form.fullName.value.trim(),
+        email: form.email.value.trim(),
+        role: form.role.value
+      };
+      if (!data.fullName || !data.email || !data.role) {
+        return showError("Fill in the name, email and role.");
+      }
+
+      submit.disabled = true;
+      submit.textContent = "Creating…";
+      try {
+        const { data: res } = await createStaffUser(data);
+        document.getElementById("result-name").textContent = data.fullName;
+        document.getElementById("setup-link").value = res.setupLink;
+        form.hidden = true;
+        result.hidden = false;
+      } catch (err) {
+        showError(err.message || "Could not create the account. Try again.");
+      } finally {
+        submit.disabled = false;
+        submit.textContent = "Create account";
+      }
+    });
+
+    document.getElementById("copy").addEventListener("click", async (e) => {
+      await navigator.clipboard.writeText(document.getElementById("setup-link").value);
+      e.target.textContent = "Copied";
+      setTimeout(() => (e.target.textContent = "Copy"), 2000);
+    });
+
+    document.getElementById("another").addEventListener("click", () => {
+      form.reset();
+      form.hidden = false;
+      result.hidden = true;
+      form.fullName.focus();
+    });
+
+    function showError(msg) {
+      notice.textContent = msg;
+      notice.hidden = false;
+    }
+  </script>
+</body>
+</html>

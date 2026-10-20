@@ -1,0 +1,7 @@
+rules_version = '2';
+// Nothing is stored in Cloud Storage yet (the school logo is served from Hosting).
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}
